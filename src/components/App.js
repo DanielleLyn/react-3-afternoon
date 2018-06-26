@@ -4,7 +4,10 @@ import './App.css';
 
 import Header from './Header/Header';
 import Compose from './Compose/Compose';
+import axios from 'axios';
+import Post from './Post/Post';
 
+const baseUrl = "https://practiceapi.devmountain.com/api";
 class App extends Component {
   constructor() {
     super();
@@ -19,18 +22,35 @@ class App extends Component {
   }
   
   componentDidMount() {
-
-  }
-
-  updatePost() {
+    axios.get(`${baseUrl}/posts`).then(response => {
+    this.setState({
+      posts: response.data
+    });
+  });
+} 
   
+
+
+  updatePost(id, text) {
+  axios.put(`${baseUrl}/posts`).then(response => {
+    this.setState({
+      posts: response.data
+    });
+  })
   }
 
-  deletePost() {
-
+  deletePost(id) {
+    axios.delete(`${baseUrl}/posts`).then(response => {
+      this.setState({posts:response.data
+      });
+    })
   }
 
-  createPost() {
+  createPost(text) {
+    axios.post(`${baseUrl}/posts`, {text}).then(response => {
+      this.setState({posts:response.data
+      });
+    })
 
   }
 
@@ -43,8 +63,17 @@ class App extends Component {
 
         <section className="App__content">
 
-          <Compose />
-          
+          <Compose createPostFn={this.createPost} />
+          {
+            posts.map(post => (
+        <Post key={post.id} 
+              text={post.text}
+              date={post.date} 
+              id={post.id}
+              updatePostFn={this.updatePost}
+              deletePostFn={this.deletePost} />
+            ))
+          }
         </section>
       </div>
     );
